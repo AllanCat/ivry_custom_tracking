@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\PSMoveService">
+      <UniqueIdentifier>{b5a6d2f6-2bf2-445a-a169-e287b32fd7ee}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ivry_custom_tracking.h">
@@ -24,6 +27,21 @@
     <ClInclude Include="..\IvryTrackingApp\IvryTrackingApp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PSMoveService\ClientConstants.h">
+      <Filter>Source Files\PSMoveService</Filter>
+    </ClInclude>
+    <ClInclude Include="PSMoveService\ClientGeometry_CAPI.h">
+      <Filter>Source Files\PSMoveService</Filter>
+    </ClInclude>
+    <ClInclude Include="PSMoveService\PSMoveClient_CAPI.h">
+      <Filter>Source Files\PSMoveService</Filter>
+    </ClInclude>
+    <ClInclude Include="PSMoveService\PSMoveClient_export.h">
+      <Filter>Source Files\PSMoveService</Filter>
+    </ClInclude>
+    <ClInclude Include="PSMoveService\SharedConstants.h">
+      <Filter>Source Files\PSMoveService</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ivry_custom_tracking.cpp">
@@ -32,5 +50,15 @@
     <ClCompile Include="IvryCustomTrackingApp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PSMoveService\PSMoveClient_CAPI.dll">
+      <Filter>Source Files\PSMoveService</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="PSMoveService\PSMoveClient_CAPI.lib">
+      <Filter>Source Files\PSMoveService</Filter>
+    </Library>
   </ItemGroup>
 </Project>

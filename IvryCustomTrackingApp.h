@@ -22,6 +22,7 @@
 #define _IVRY_CUSTOM_TRACKING_APP_H
 
 #include "IvryTrackingApp.h"
+#include "PSMoveService/PSMoveClient_CAPI.h"
 
 class IvryCustomTrackingApp : public IvryTrackingApp
 {
@@ -52,6 +53,15 @@ private:
 
 	/** Use device orientation tracking? **/
 	bool m_bUseDeviceOrientation;
+
+	/** Initialize PSMoveService's Hmd data connection  **/
+	void InitPSMoveService();
+
+	/** Hmd data **/
+	PSMHmdList hmdList;
+	PSMVector3f hmdPose;
+	bool success = false;
+	short retry = 10;
 };
 
 #endif // _IVRY_CUSTOM_TRACKING_APP_H

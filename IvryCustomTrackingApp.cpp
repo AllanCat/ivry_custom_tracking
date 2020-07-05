@@ -55,6 +55,16 @@ DWORD IvryCustomTrackingApp::Run()
 			// enabling external tracking would normally be done once the external 
 			// tracking had actually begun, to avoid no tracking being active
 
+			for (int i = 0; i < retry; i++) {
+				if (!success) {
+					InitPSMoveService();
+					Sleep(1000);
+				}
+				else {
+					break;
+				}
+			}
+
 			// Disable device orientation
 			EnableDeviceOrientation(false);
 
@@ -100,24 +110,14 @@ void IvryCustomTrackingApp::OnDevicePoseUpdated(const vr::DriverPose_t &pose)
 		updatedPose.qRotation = { 1, 0, 0, 0 };
 	}
 
-	// Simulate position with arrow keys
-	// Shift and up/down arrow for height
-	bool shiftDown = (::GetAsyncKeyState(VK_LSHIFT) || ::GetAsyncKeyState(VK_RSHIFT));
-	if (::GetAsyncKeyState(VK_UP))
-	{
-		m_afPosition[shiftDown ? 1 : 2] += 0.001;
-	}
-	if (::GetAsyncKeyState(VK_DOWN))
-	{
-		m_afPosition[shiftDown ? 1 : 2] -= 0.001;
-	}
-	if (::GetAsyncKeyState(VK_LEFT))
-	{
-		m_afPosition[0] += 0.001;
-	}
-	if (::GetAsyncKeyState(VK_RIGHT))
-	{
-		m_afPosition[0] -= 0.001;
+	if (success) {
+		PSM_Update();
+		if (hmdList.count > 0) {
+			PSM_GetHmdPosition(hmdList.hmd_id[0], &hmdPose);
+			m_afPosition[0] = (double)hmdPose.x * 0.01;
+			m_afPosition[1] = (double)hmdPose.y * 0.01;
+			m_afPosition[2] = (double)hmdPose.z * 0.01;
+		}
 	}
 
 	// Use tracker position
@@ -140,10 +140,47 @@ void IvryCustomTrackingApp::OnQuit()
 {
 	if (m_hQuitEvent != INVALID_HANDLE_VALUE)
 	{
+		if (hmdList.count > 0)
+		{
+			PSM_StopHmdDataStream(hmdList.hmd_id[0], PSM_DEFAULT_TIMEOUT);
+			PSM_FreeHmdListener(hmdList.hmd_id[0]);
+		}
+		PSM_Shutdown();
+
 		// Signal that Run() can exit
 		::SetEvent(m_hQuitEvent);
 	}
 
 	LogMessage("Shutting down\n");
+}
+
+void IvryCustomTrackingApp::InitPSMoveService() {
+	success = true;
+	if (PSM_Initialize(PSMOVESERVICE_DEFAULT_ADDRESS, PSMOVESERVICE_DEFAULT_PORT, PSM_DEFAULT_TIMEOUT) != PSMResult_Success)
+	{
+		LogMessage("Failed to initialize the client network manager");
+		success = false;
+	}
+	if (success)
+	{
+		memset(&hmdList, 0, sizeof(PSMHmdList));
+		PSM_GetHmdList(&hmdList, PSM_DEFAULT_TIMEOUT);
+
+		// Register as listener and start streams
+		unsigned int data_stream_flags = PSMControllerDataStreamFlags::PSMStreamFlags_includePositionData;
+
+		//HMD
+		if (hmdList.count > 0) {
+			if (PSM_AllocateHmdListener(hmdList.hmd_id[0]) != PSMResult_Success) {
+				LogMessage("Failed to AllocateHmdListener");
+				success = false;
+			}
+				
+			if (PSM_StartHmdDataStream(hmdList.hmd_id[0], data_stream_flags, PSM_DEFAULT_TIMEOUT) != PSMResult_Success) {
+				LogMessage("Failed to StartHmdDataStream");
+				success = false;
+			}
+		}
+	}
 }
 
